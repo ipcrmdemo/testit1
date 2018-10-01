@@ -1,7 +1,7 @@
 ---
 applications:
 - name: "aad"
-  memory: 1024M
+  memory: 512M: 1024M
   instances: 1
   buildpack: https://github.com/cloudfoundry/java-buildpack.git
   env:
