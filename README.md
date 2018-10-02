@@ -12,7 +12,7 @@ fffff
 ### Run locally
 
 You can run the service locally using the following from the command:
-f
+ff
 ```
 $ ./mvnw spring-boot:runf
 ```
