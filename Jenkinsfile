@@ -42,24 +42,18 @@ podTemplate(label: label) {
           }
 
           stage('Notify') {
-              steps {
-                  echo 'Sending build start...'
-                  notifyAtomist(env.ATOMIST_WORKSPACES, 'STARTED', 'STARTED')
-              }
+            echo 'Sending build start...'
+            notifyAtomist(env.ATOMIST_WORKSPACES, 'STARTED', 'STARTED')
           }
 
           stage('Set version') {
-              steps {
-                  echo 'Setting version...'
-                  sh "${env.MVN} versions:set -DnewVersion=${env.COMMIT_SHA} versions:commit"
-              }
+            echo 'Setting version...'
+            sh "${env.MVN} versions:set -DnewVersion=${env.COMMIT_SHA} versions:commit"
           }
 
           stage('Build, Test, and Package') {
-              steps {
-                  echo 'Building, testing, and packaging...'
-                  sh "${env.MVN} clean package"
-              }
+            echo 'Building, testing, and packaging...'
+            sh "${env.MVN} clean package"
           }
         }
         currentBuild.result = 'SUCCESS'
