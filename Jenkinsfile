@@ -79,11 +79,10 @@ podTemplate(label: label) {
             currentBuild.result = 'SUCCESS'
             notifyAtomist(
               env.ATOMIST_WORKSPACES,
-              'STARTED',
+              currentBuild.result
               url,
               scmVars.GIT_BRANCH,
               scmVars.GIT_COMMIT,
-              currentBuild.result
             )
 
         } catch (Exception err) {
@@ -91,11 +90,10 @@ podTemplate(label: label) {
           currentBuild.result = 'FAILURE'
           notifyAtomist(
             env.ATOMIST_WORKSPACES,
-            'STARTED',
+            currentBuild.result
             url,
             scmVars.GIT_BRANCH,
             scmVars.GIT_COMMIT,
-            currentBuild.result
           )
 
         }
