@@ -27,9 +27,9 @@ def notifyAtomist(
                 status: buildStatus,
                 full_url: env.BUILD_URL,
                 scm: [
-                    url: env.GIT_URL,
-                    branch: env.COMMIT_BRANCH,
-                    commit: env.COMMIT_SHA
+                    url: gitUrl,
+                    branch: gitBranch,
+                    commit: gitCommitSha
                 ]
             ]
         ]
@@ -46,10 +46,11 @@ podTemplate(label: label) {
     node(label) {
         try {
             final scmVars = checkout(scm)
+            def url = sh(returnStdout: true, script: 'git config remote.origin.url').trim()
             echo "scmVars: ${scmVars}"
             echo "scmVars.GIT_COMMIT: ${scmVars.GIT_COMMIT}"
             echo "scmVars.GIT_BRANCH: ${scmVars.GIT_BRANCH}"
-            def url = sh(returnStdout: true, script: 'git config remote.origin.url').trim()
+            echo "url: ${url}"
       
             stage('Notify') {
               echo 'Sending build start...'
