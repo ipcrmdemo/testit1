@@ -35,12 +35,12 @@ def notifyAtomist(String workspaceIds, String buildStatus, String buildPhase="FI
 
 def label = "mypod-${UUID.randomUUID().toString()}"
 podTemplate(label: label) {
-    node(label) {
-      environment {
-          MVN = 'mvn -B -V'
-      }
+    try {
+      node(label) {
+          environment {
+              MVN = 'mvn -B -V'
+          }
 
-      stages {
           stage('Notify') {
               steps {
                   echo 'Sending build start...'
@@ -61,14 +61,11 @@ podTemplate(label: label) {
                   sh "${env.MVN} clean package"
               }
           }
-
         }
-    }
-
-    post {
-        always {
-            echo 'Post notification...'
+        currentBuild.result = 'SUCCESS'
             notifyAtomist(env.ATOMIST_WORKSPACES, currentBuild.currentResult)
-        }
+    } catch (Exception err) {
+        currentBuild.result = 'FAILURE'
+        notifyAtomist(env.ATOMIST_WORKSPACES, currentBuild.currentResult)
     }
 }
