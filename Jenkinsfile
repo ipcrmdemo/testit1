@@ -44,58 +44,62 @@ def notifyAtomist(
 def label = "mypod-${UUID.randomUUID().toString()}"
 podTemplate(label: label) {
     node(label) {
-        try {
-            final scmVars = checkout(scm)
-            def url = sh(returnStdout: true, script: 'git config remote.origin.url').trim()
-            echo "scmVars: ${scmVars}"
-            echo "scmVars.GIT_COMMIT: ${scmVars.GIT_COMMIT}"
-            echo "scmVars.GIT_BRANCH: ${scmVars.GIT_BRANCH}"
-            echo "url: ${url}"
-      
-            stage('Notify') {
-              echo 'Sending build start...'
+      withCredentials([[$class: 'string', credentialsId: 'atomist-workspace',
+                    variable: 'ATOMIST_WORKSPACES']]) {
+
+          try {
+              final scmVars = checkout(scm)
+              def url = sh(returnStdout: true, script: 'git config remote.origin.url').trim()
+              echo "scmVars: ${scmVars}"
+              echo "scmVars.GIT_COMMIT: ${scmVars.GIT_COMMIT}"
+              echo "scmVars.GIT_BRANCH: ${scmVars.GIT_BRANCH}"
+              echo "url: ${url}"
+        
+              stage('Notify') {
+                echo 'Sending build start...'
+                notifyAtomist(
+                  ATOMIST_WORKSPACES,
+                  'STARTED',
+                  url,
+                  scmVars.GIT_BRANCH,
+                  scmVars.GIT_COMMIT,
+                  'STARTED'
+                )
+              }
+
+              withMaven(maven: 'default') {
+                  stage('Set version') {
+                    echo 'Setting version...'
+                    sh "mvn versions:set -DnewVersion=${scmVars.GIT_COMMIT} versions:commit"
+                  }
+
+                  stage('Build, Test, and Package') {
+                    echo 'Building, testing, and packaging...'
+                    sh "mvn clean package -Dskiptests"
+                  }
+              }
+
+              currentBuild.result = 'SUCCESS'
               notifyAtomist(
-                env.ATOMIST_WORKSPACES,
-                'STARTED',
+                ATOMIST_WORKSPACES,
+                currentBuild.result,
                 url,
                 scmVars.GIT_BRANCH,
-                scmVars.GIT_COMMIT,
-                'STARTED'
+                scmVars.GIT_COMMIT
               )
-            }
 
-            withMaven(maven: 'default') {
-                stage('Set version') {
-                  echo 'Setting version...'
-                  sh "mvn versions:set -DnewVersion=${scmVars.GIT_COMMIT} versions:commit"
-                }
+          } catch (Exception err) {
 
-                stage('Build, Test, and Package') {
-                  echo 'Building, testing, and packaging...'
-                  sh "mvn clean package -Dskiptests"
-                }
-            }
-
-            currentBuild.result = 'SUCCESS'
+            currentBuild.result = 'FAILURE'
             notifyAtomist(
-              env.ATOMIST_WORKSPACES,
+              ATOMIST_WORKSPACES,
               currentBuild.result,
               url,
               scmVars.GIT_BRANCH,
               scmVars.GIT_COMMIT
             )
 
-        } catch (Exception err) {
-
-          currentBuild.result = 'FAILURE'
-          notifyAtomist(
-            env.ATOMIST_WORKSPACES,
-            currentBuild.result,
-            url,
-            scmVars.GIT_BRANCH,
-            scmVars.GIT_COMMIT
-          )
-
-        }
+          }
+      }
     }
 }
