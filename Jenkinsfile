@@ -44,7 +44,7 @@ def notifyAtomist(
 def label = "mypod-${UUID.randomUUID().toString()}"
 podTemplate(label: label) {
     node(label) {
-      withCredentials([[$class: 'string', credentialsId: 'atomist-workspace',
+      withCredentials([[$class: 'StringBinding', credentialsId: 'atomist-workspace',
                     variable: 'ATOMIST_WORKSPACES']]) {
 
           try {
