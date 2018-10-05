@@ -28,7 +28,7 @@ def notifyAtomist(String workspaceIds, String buildStatus, String buildPhase="FI
     )
     workspaceIds.split(',').each { workspaceId ->
         String endpoint = "https://webhook.atomist.com/atomist/jenkins/teams/${workspaceId}"
-        sh "/bin/curl --silent -X POST -H 'Content-Type: application/json' -d '${payload}' ${endpoint}"
+        sh "curl --silent -X POST -H 'Content-Type: application/json' -d '${payload}' ${endpoint}"
     }
 }
 
