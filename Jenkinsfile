@@ -36,29 +36,33 @@ def notifyAtomist(String workspaceIds, String buildStatus, String buildPhase="FI
 def label = "mypod-${UUID.randomUUID().toString()}"
 podTemplate(label: label) {
     try {
-      node(label) {
+        node(label) {
 
-          stage('Notify') {
-            echo 'Sending build start...'
-            notifyAtomist(env.ATOMIST_WORKSPACES, 'STARTED', 'STARTED')
-          }
+            stage('Notify') {
+              echo 'Sending build start...'
+              notifyAtomist(env.ATOMIST_WORKSPACES, 'STARTED', 'STARTED')
+            }
 
-          withMaven(maven: 'default') {
-              stage('Set version') {
-                echo 'Setting version...'
-                sh "mvn -V -B versions:set -DnewVersion=${env.COMMIT_SHA} versions:commit"
-              }
+            withMaven(maven: 'default') {
+                stage('Set version') {
+                  echo 'Setting version...'
+                  sh "mvn -V -B versions:set -DnewVersion=${env.COMMIT_SHA} versions:commit"
+                }
 
-              stage('Build, Test, and Package') {
-                echo 'Building, testing, and packaging...'
-                sh "mvn -V -B clean package"
-              }
-          }
+                stage('Build, Test, and Package') {
+                  echo 'Building, testing, and packaging...'
+                  sh "mvn -V -B clean package"
+                }
+            }
+        }
 
-          currentBuild.result = 'SUCCESS'
-          notifyAtomist(env.ATOMIST_WORKSPACES, currentBuild.currentResult)
+        currentBuild.result = 'SUCCESS'
+        notifyAtomist(env.ATOMIST_WORKSPACES, currentBuild.currentResult)
+
     } catch (Exception err) {
+
         currentBuild.result = 'FAILURE'
         notifyAtomist(env.ATOMIST_WORKSPACES, currentBuild.currentResult)
+
     }
 }
