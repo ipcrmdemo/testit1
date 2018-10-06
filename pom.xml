@@ -86,6 +86,14 @@
 			<name>bintray</name>
 			<url>https://dl.bintray.com/atomist/atomist</url>
 		</repository>
-	</repositories>
+  </repositories>
+
+  <distributionManagement>
+    <snapshotRepository>
+        <id>snapshots</id>
+        <name>artifactory-artifactory-0-snapshots</name>
+        <url>https://artifactory:443/artifactory/libs-snapshot-local</url>
+    </snapshotRepository>
+</distributionManagement>
 
 </project>
