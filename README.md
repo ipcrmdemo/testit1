@@ -18,9 +18,9 @@ $ ./mvnw spring-boot:runf
 ```f
 
 ### Run testssfsdff
-f
+ff
 This service comes with some rudimentary tesfts as a good starting
-point for writing your own.  Use the following command to execute the
+point for writing your own.  Use the follfowing command to execute the
 tests using Maven:
 
 ```
