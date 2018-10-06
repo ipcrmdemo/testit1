@@ -41,60 +41,57 @@ def notifyAtomist(
 }
 
 
-def label = "mypod-${UUID.randomUUID().toString()}"
-podTemplate(label: label) {
-    node(label) {
-      withCredentials([[$class: 'StringBinding', credentialsId: 'atomist-workspace',
-                    variable: 'ATOMIST_WORKSPACES']]) {
+node(label) {
+  withCredentials([[$class: 'StringBinding', credentialsId: 'atomist-workspace',
+                variable: 'ATOMIST_WORKSPACES']]) {
 
-          try {
-              final scmVars = checkout(scm)
-              def url = sh(returnStdout: true, script: 'git config remote.origin.url').trim()
-              echo "scmVars: ${scmVars}"
-              echo "scmVars.GIT_COMMIT: ${scmVars.GIT_COMMIT}"
-              echo "scmVars.GIT_BRANCH: ${scmVars.GIT_BRANCH}"
-              echo "url: ${url}"
-        
-              stage('Notify') {
-                echo 'Sending build start...'
-                notifyAtomist(
-                  ATOMIST_WORKSPACES,
-                  'STARTED',
-                  url,
-                  scmVars.GIT_BRANCH,
-                  scmVars.GIT_COMMIT,
-                  'STARTED'
-                )
-              }
-
-              withMaven(maven: 'default') {
-                  stage('Build, Test, and Package') {
-                    echo 'Building, testing, and packaging...'
-                    sh "mvn clean package"
-                  }
-              }
-
-              currentBuild.result = 'SUCCESS'
-              notifyAtomist(
-                ATOMIST_WORKSPACES,
-                currentBuild.result,
-                url,
-                scmVars.GIT_BRANCH,
-                scmVars.GIT_COMMIT
-              )
-
-          } catch (Exception err) {
-
-            currentBuild.result = 'FAILURE'
+      try {
+          final scmVars = checkout(scm)
+          def url = sh(returnStdout: true, script: 'git config remote.origin.url').trim()
+          echo "scmVars: ${scmVars}"
+          echo "scmVars.GIT_COMMIT: ${scmVars.GIT_COMMIT}"
+          echo "scmVars.GIT_BRANCH: ${scmVars.GIT_BRANCH}"
+          echo "url: ${url}"
+    
+          stage('Notify') {
+            echo 'Sending build start...'
             notifyAtomist(
               ATOMIST_WORKSPACES,
-              currentBuild.result,
+              'STARTED',
               url,
               scmVars.GIT_BRANCH,
-              scmVars.GIT_COMMIT
+              scmVars.GIT_COMMIT,
+              'STARTED'
             )
-
           }
+
+          withMaven(maven: 'default') {
+              stage('Build, Test, and Package') {
+                echo 'Building, testing, and packaging...'
+                sh "mvn clean package"
+              }
+          }
+
+          currentBuild.result = 'SUCCESS'
+          notifyAtomist(
+            ATOMIST_WORKSPACES,
+            currentBuild.result,
+            url,
+            scmVars.GIT_BRANCH,
+            scmVars.GIT_COMMIT
+          )
+
+      } catch (Exception err) {
+
+        currentBuild.result = 'FAILURE'
+        notifyAtomist(
+          ATOMIST_WORKSPACES,
+          currentBuild.result,
+          url,
+          scmVars.GIT_BRANCH,
+          scmVars.GIT_COMMIT
+        )
+
       }
-    }
+  }
 }
