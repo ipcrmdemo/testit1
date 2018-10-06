@@ -68,14 +68,9 @@ podTemplate(label: label) {
               }
 
               withMaven(maven: 'default') {
-                  stage('Set version') {
-                    echo 'Setting version...'
-                    sh "mvn versions:set -DnewVersion=${scmVars.GIT_COMMIT} versions:commit"
-                  }
-
                   stage('Build, Test, and Package') {
                     echo 'Building, testing, and packaging...'
-                    sh "mvn clean package -Dskiptests"
+                    sh "mvn clean package"
                   }
               }
 
