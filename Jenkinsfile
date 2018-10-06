@@ -41,7 +41,7 @@ def notifyAtomist(
 }
 
 
-node(label) {
+node() {
   withCredentials([[$class: 'StringBinding', credentialsId: 'atomist-workspace',
                 variable: 'ATOMIST_WORKSPACES']]) {
 
