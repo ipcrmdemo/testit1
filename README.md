@@ -15,7 +15,7 @@ You can run the service locally using the following from the command:
 fffff
 ```
 $ ./mvnw spring-boot:runf
-```f
+```
 
 ### Run testssfsdff
 ff
@@ -25,7 +25,7 @@ tests using Maven:
 
 ```
 $ ./mvnw test
-```dd
+```
 
 ---
 
