@@ -6,7 +6,7 @@ Based on seed project `atomist-seeds:spring-rest-seed`...
 ## Development
 
 This project is driven using [Maven][mvn].
-ffffff
+
 [mvn]: https://maven.apache.org/ (Maven)
 
 ### Run locally
